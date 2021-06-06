@@ -12,14 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <windows.h>
 
 #define MEMORY_SIZE_MAX 1024
+#define BYTE_LEN 8
 
 typedef struct Memory
 {
     char *memory;
-    int data[8];
-    int address[8];
+    int data[BYTE_LEN];
+    int address[BYTE_LEN];
     bool read;
     bool write;
 } Memory;
@@ -30,8 +32,10 @@ typedef struct Memory
 
 Memory *createMemory(void);
 void destoryMemory(Memory *a);
-void outputMemoryIC(Memory *a);
+void outputMemoryIC(Memory *a, int opearte);
 void putMenu(void);
+void readMemory(Memory *a);
+void writeMemory(Memory *a, char[], int len);
 
 #endif
 
@@ -40,20 +44,96 @@ int main(void)
     Memory *memIC = createMemory();
     char str[MEMORY_SIZE_MAX];
 
-    destoryMemory(memIC);
-    return 0;
+    while (1)
+    {
+        int choice = 1;
+        putMenu();
+        scanf("%d", &choice);
+        switch (choice)
+        {
+        case 1:
+            scanf("%s", str);
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            // memset(memIC->data, -1, sizeof memIC->data);
+            // memset(memIC->address, -1, sizeof memIC->address);
+            outputMemoryIC(memIC, 0);
+            break;
+        default:
+            destoryMemory(memIC);
+            return 0;
+        }
+    } // while end
 }
 
 // Instantiate a memory object.
 Memory *createMemory(void)
 {
-    Memory a = {NULL, {0}, {0}, false, false};
-    a.memory = (Memory *)malloc(sizeof(Memory) * MEMORY_SIZE_MAX);
-    return (&a);
+    Memory *a = (Memory *)malloc(sizeof(Memory));
+    a->memory = (char *)malloc(sizeof(char) * MEMORY_SIZE_MAX);
+    return a;
 }
 
 // Destory the memory occupied by imitation memory.
 void destoryMemory(Memory *a)
 {
     free(a->memory);
+    a->memory = NULL;
+    free(a);
+    a = NULL;
+}
+
+// Output status of memory IC.
+// Opearte  : One stands status of now, zero stands void.
+void outputMemoryIC(Memory *a, int opearte)
+{
+    system("cls");
+    if (opearte == 0)
+        printf("            |    |    |    |    |    |    |    |    |              \n");
+    else
+    {
+        printf("            %d", a->read);
+        for (int i = 0; i < BYTE_LEN; i++)
+            printf("    %d", a->data[i]);
+        printf("              \n");
+    }
+    printf("      ______|____|____|____|____|____|____|____|____|______        \n");
+    printf("      |    RD    d0   d1   d2   d3   d4   d5   d6   d7    |        \n");
+    printf("      |\\                                                  |        \n");
+    printf("      |/                                                  |        \n");
+    printf("      |____WR____a0___a1___a2___a3___a4___a5___a6___a7____|        \n");
+    printf("            |    |    |    |    |    |    |    |    |              \n");
+    if (opearte == 0)
+    {
+        printf("            |    |    |    |    |    |    |    |    |              \n");
+        Sleep(2000);
+    }
+    else
+    {
+        printf("            %d", a->write);
+        for (int i = 0; i < BYTE_LEN; i++)
+            printf("    %d", a->address[i]);
+        printf("              \n");
+    }
+    Sleep(1000);
+    system("cls");
+}
+
+// Process of Menu format printing.
+void putMenu(void)
+{
+    printf("************************************************************\n");
+    printf("*         Welcome to 1KB memory display program!           *\n");
+    printf("*----------------------------------------------------------*\n");
+    printf("* 1. Input a string, which length between 0 and 1024.      *\n");
+    printf("* 2. Watch the process of storing this string.             *\n");
+    printf("* 3. Watch the process of reading this string.             *\n");
+    printf("* 4. Put a void memory IC.                                 *\n");
+    printf("* 5. Quit this program.                                    *\n");
+    printf("************************************************************\n");
+    printf("Please input your choice :  ");
 }
