@@ -35,7 +35,8 @@ void destoryMemory(Memory *a);
 void outputMemoryIC(Memory *a, int opearte);
 void putMenu(void);
 void readMemory(Memory *a);
-void writeMemory(Memory *a, char[], int len);
+void writeMemory(Memory *a, char s[], int len);
+void numToBinary(int num, int * arr);
 
 #endif
 
@@ -52,11 +53,14 @@ int main(void)
         switch (choice)
         {
         case 1:
-            scanf("%s", str);
+            gets(str);
+            strcpy(memIC->memory, str);
             break;
         case 2:
+            readMemory(memIC);
             break;
         case 3:
+            writeMemory(memIC, str, strlen(str));
             break;
         case 4:
             // memset(memIC->data, -1, sizeof memIC->data);
@@ -78,6 +82,45 @@ Memory *createMemory(void)
     return a;
 }
 
+void readMemory(Memory *a)
+{
+    a->read = 1;
+    a->write = 0;
+    int i = 0;
+    while (a->memory[i] != '\n')
+    {
+        printf("Reading : ");
+        for (int j = 0; j < i; j++)
+            printf("%c", a->memory[j]);
+        printf("\n");
+        numToBinary(i, a->address);
+        numToBinary(a->memory[i], a->data);
+        outputMemoryIC(a, 1);
+        system("cls");
+    }
+}
+
+void writeMemory(Memory *a, char s[], int len)
+{
+    a->read = 0;
+    a->write = 1;
+    for (int i = 0; i < len; i++)
+    {
+        printf("Writting : ");
+        for (int j = 0; j < i; j++)
+            printf("%c", s[j]);
+        printf("\n");
+
+        a->memory[i] = s[i];
+        numToBinary(i, a->address);
+        numToBinary(s[i], a->data);
+        outputMemoryIC(a, 1);
+        system("cls");
+    }
+    a->memory[len] = '\n';
+}
+
+
 // Destory the memory occupied by imitation memory.
 void destoryMemory(Memory *a)
 {
@@ -91,21 +134,20 @@ void destoryMemory(Memory *a)
 // Opearte  : One stands status of now, zero stands void.
 void outputMemoryIC(Memory *a, int opearte)
 {
-    system("cls");
     if (opearte == 0)
         printf("            |    |    |    |    |    |    |    |    |              \n");
     else
     {
         printf("            %d", a->read);
-        for (int i = 0; i < BYTE_LEN; i++)
-            printf("    %d", a->data[i]);
+        for (int i = BYTE_LEN; i >= 0; i--)
+            printf("    %1d", a->data[i]);
         printf("              \n");
     }
     printf("      ______|____|____|____|____|____|____|____|____|______        \n");
-    printf("      |    RD    d0   d1   d2   d3   d4   d5   d6   d7    |        \n");
+    printf("      |    RD    d7   d6   d5   d4   d3   d2   d1   d0    |        \n");
     printf("      |\\                                                  |        \n");
     printf("      |/                                                  |        \n");
-    printf("      |____WR____a0___a1___a2___a3___a4___a5___a6___a7____|        \n");
+    printf("      |____WR____a7___a6___a5___a4___a3___a2___a1___a0____|        \n");
     printf("            |    |    |    |    |    |    |    |    |              \n");
     if (opearte == 0)
     {
@@ -115,12 +157,11 @@ void outputMemoryIC(Memory *a, int opearte)
     else
     {
         printf("            %d", a->write);
-        for (int i = 0; i < BYTE_LEN; i++)
-            printf("    %d", a->address[i]);
+        for (int i = BYTE_LEN; i >= 0; i--)
+            printf("    %1d", a->address[i]);
         printf("              \n");
     }
     Sleep(1000);
-    system("cls");
 }
 
 // Process of Menu format printing.
@@ -136,4 +177,13 @@ void putMenu(void)
     printf("* 5. Quit this program.                                    *\n");
     printf("************************************************************\n");
     printf("Please input your choice :  ");
+}
+
+void numToBinary(int num, int * arr)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        arr[i] = num & 1;
+        num >>= 1;
+    }
 }
