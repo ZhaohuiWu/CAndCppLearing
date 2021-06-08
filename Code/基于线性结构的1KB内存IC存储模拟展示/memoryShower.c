@@ -36,7 +36,7 @@ void outputMemoryIC(Memory *a, int opearte);
 void putMenu(void);
 void readMemory(Memory *a);
 void writeMemory(Memory *a, char s[], int len);
-void numToBinary(int num, int * arr);
+void numToBinary(int num, int *arr);
 
 #endif
 
@@ -52,25 +52,26 @@ int main(void)
         scanf("%d", &choice);
         switch (choice)
         {
-        case 1:
-            gets(str);
-            strcpy(memIC->memory, str);
-            break;
-        case 2:
-            readMemory(memIC);
-            break;
-        case 3:
-            writeMemory(memIC, str, strlen(str));
-            break;
-        case 4:
-            // memset(memIC->data, -1, sizeof memIC->data);
-            // memset(memIC->address, -1, sizeof memIC->address);
-            outputMemoryIC(memIC, 0);
-            break;
-        default:
-            destoryMemory(memIC);
-            return 0;
+            case 1:
+                getchar();
+                gets(str);
+                strcpy(memIC->memory, str);
+                break;
+            case 2:
+                readMemory(memIC);
+                break;
+            case 3:
+                writeMemory(memIC, str, strlen(str));
+                break;
+            case 4:
+                system("cls");
+                outputMemoryIC(memIC, 0);
+                break;
+            default:
+                destoryMemory(memIC);
+                return 0;
         }
+        system("cls");
     } // while end
 }
 
@@ -87,8 +88,11 @@ void readMemory(Memory *a)
     a->read = 1;
     a->write = 0;
     int i = 0;
-    while (a->memory[i] != '\n')
+    system("cls");
+    Sleep(1000);    // Reduce virual conflict.
+    while (a->memory[i] != '\0')
     {
+        system("cls");
         printf("Reading : ");
         for (int j = 0; j < i; j++)
             printf("%c", a->memory[j]);
@@ -96,7 +100,7 @@ void readMemory(Memory *a)
         numToBinary(i, a->address);
         numToBinary(a->memory[i], a->data);
         outputMemoryIC(a, 1);
-        system("cls");
+        i++;
     }
 }
 
@@ -106,20 +110,18 @@ void writeMemory(Memory *a, char s[], int len)
     a->write = 1;
     for (int i = 0; i < len; i++)
     {
+        system("cls");
         printf("Writting : ");
         for (int j = 0; j < i; j++)
             printf("%c", s[j]);
         printf("\n");
-
         a->memory[i] = s[i];
         numToBinary(i, a->address);
         numToBinary(s[i], a->data);
         outputMemoryIC(a, 1);
-        system("cls");
     }
-    a->memory[len] = '\n';
+    a->memory[len] = '\0';
 }
-
 
 // Destory the memory occupied by imitation memory.
 void destoryMemory(Memory *a)
@@ -135,11 +137,14 @@ void destoryMemory(Memory *a)
 void outputMemoryIC(Memory *a, int opearte)
 {
     if (opearte == 0)
+    {
+        printf("*******************************************************************\n");
         printf("            |    |    |    |    |    |    |    |    |              \n");
+    }
     else
     {
         printf("            %d", a->read);
-        for (int i = BYTE_LEN; i >= 0; i--)
+        for (int i = BYTE_LEN - 1; i >= 0; i--)
             printf("    %1d", a->data[i]);
         printf("              \n");
     }
@@ -152,12 +157,18 @@ void outputMemoryIC(Memory *a, int opearte)
     if (opearte == 0)
     {
         printf("            |    |    |    |    |    |    |    |    |              \n");
-        Sleep(2000);
+        printf("-------------------------------------------------------------------\n");
+        printf("   RD    :  Status of read signal.                                 \n");
+        printf("   WR    :  Status of write signal.                                \n");
+        printf("  d(0-8) :  Status of data translate interfaces.                   \n");
+        printf("  a(0-8) :  Status of address translate interfaces.                \n");
+        printf("*******************************************************************\n");
+        Sleep(4000);
     }
     else
     {
         printf("            %d", a->write);
-        for (int i = BYTE_LEN; i >= 0; i--)
+        for (int i = BYTE_LEN - 1; i >= 0; i--)
             printf("    %1d", a->address[i]);
         printf("              \n");
     }
@@ -171,7 +182,7 @@ void putMenu(void)
     printf("*         Welcome to 1KB memory display program!           *\n");
     printf("*----------------------------------------------------------*\n");
     printf("* 1. Input a string, which length between 0 and 1024.      *\n");
-    printf("* 2. Watch the process of storing this string.             *\n");
+    printf("* 2. Watch the process of writting this string.            *\n");
     printf("* 3. Watch the process of reading this string.             *\n");
     printf("* 4. Put a void memory IC.                                 *\n");
     printf("* 5. Quit this program.                                    *\n");
@@ -179,7 +190,7 @@ void putMenu(void)
     printf("Please input your choice :  ");
 }
 
-void numToBinary(int num, int * arr)
+void numToBinary(int num, int *arr)
 {
     for (int i = 0; i < 8; i++)
     {
