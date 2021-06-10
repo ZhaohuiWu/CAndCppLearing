@@ -16,12 +16,13 @@
 
 #define MEMORY_SIZE_MAX 1024
 #define BYTE_LEN 8
+#define ADDRESS_LEN 10
 
 typedef struct Memory
 {
     char *memory;
     int data[BYTE_LEN];
-    int address[BYTE_LEN];
+    int address[ADDRESS_LEN];
     bool read;
     bool write;
 } Memory;
@@ -36,7 +37,7 @@ void outputMemoryIC(Memory *a, int opearte);
 void putMenu(void);
 void readMemory(Memory *a);
 void writeMemory(Memory *a, char s[], int len);
-void numToBinary(int num, int *arr);
+void numToBinary(int num, int *arr, int digits);
 
 #endif
 
@@ -97,8 +98,8 @@ void readMemory(Memory *a)
         for (int j = 0; j < i; j++)
             printf("%c", a->memory[j]);
         printf("\n");
-        numToBinary(i, a->address);
-        numToBinary(a->memory[i], a->data);
+        numToBinary(i, a->address, ADDRESS_LEN);
+        numToBinary(a->memory[i], a->data, BYTE_LEN);
         outputMemoryIC(a, 1);
         i++;
     }
@@ -116,8 +117,8 @@ void writeMemory(Memory *a, char s[], int len)
             printf("%c", s[j]);
         printf("\n");
         a->memory[i] = s[i];
-        numToBinary(i, a->address);
-        numToBinary(s[i], a->data);
+        numToBinary(i, a->address, ADDRESS_LEN);
+        numToBinary(s[i], a->data, BYTE_LEN);
         outputMemoryIC(a, 1);
     }
     a->memory[len] = '\0';
@@ -138,37 +139,38 @@ void outputMemoryIC(Memory *a, int opearte)
 {
     if (opearte == 0)
     {
-        printf("*******************************************************************\n");
-        printf("            |    |    |    |    |    |    |    |    |              \n");
+        printf("******************************************************************************\n");
+        printf("            |    |    |    |    |    |    |    |    |    |    0V             \n");
     }
     else
     {
-        printf("            %d", a->read);
+        printf("            %1d    %1d", a->read, a->write);
         for (int i = BYTE_LEN - 1; i >= 0; i--)
             printf("    %1d", a->data[i]);
-        printf("              \n");
+        printf("    0V             \n");
     }
-    printf("      ______|____|____|____|____|____|____|____|____|______        \n");
-    printf("      |    RD    d7   d6   d5   d4   d3   d2   d1   d0    |        \n");
-    printf("      |\\                                                  |        \n");
-    printf("      |/                                                  |        \n");
-    printf("      |____WR____a7___a6___a5___a4___a3___a2___a1___a0____|        \n");
-    printf("            |    |    |    |    |    |    |    |    |              \n");
+    printf("       _____|____|____|____|____|____|____|____|____|____|____|_____         \n");
+    printf("      |    RD    WR   d7   d6   d5   d4   d3   d2   d1   d0   GND   |        \n");
+    printf("      |\\                                                            |        \n");
+    printf("      |/                                                            |        \n");
+    printf("      |____VCC___a9___a8___a7___a6___a5___a4___a3___a2___a1___a0____|        \n");
+    printf("            |    |    |     |    |    |    |    |    |    |    |              \n");
     if (opearte == 0)
     {
-        printf("            |    |    |    |    |    |    |    |    |              \n");
-        printf("-------------------------------------------------------------------\n");
-        printf("   RD    :  Status of read signal.                                 \n");
-        printf("   WR    :  Status of write signal.                                \n");
-        printf("  d(0-8) :  Status of data translate interfaces.                   \n");
-        printf("  a(0-8) :  Status of address translate interfaces.                \n");
-        printf("*******************************************************************\n");
+        printf("           +5V   |    |     |    |    |    |    |    |    |    |              \n");
+        printf("------------------------------------------------------------------------------\n");
+        printf("   RD    :  Status of read signal.                                            \n");
+        printf("   WR    :  Status of write signal.                                           \n");
+        printf("  d(0-8) :  Status of data translate interfaces.                              \n");
+        printf("  a(0-8) :  Status of address translate interfaces.                           \n");
+        printf(" VCC/GND :  Status of power.                                                  \n");
+        printf("******************************************************************************\n");
         Sleep(4000);
     }
     else
     {
-        printf("            %d", a->write);
-        for (int i = BYTE_LEN - 1; i >= 0; i--)
+        printf("           +5V");
+        for (int i = ADDRESS_LEN - 1; i >= 0; i--)
             printf("    %1d", a->address[i]);
         printf("              \n");
     }
@@ -190,9 +192,9 @@ void putMenu(void)
     printf("Please input your choice :  ");
 }
 
-void numToBinary(int num, int *arr)
+void numToBinary(int num, int *arr, int digits)
 {
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < digits; i++)
     {
         arr[i] = num & 1;
         num >>= 1;
